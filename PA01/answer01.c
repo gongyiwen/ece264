@@ -60,20 +60,20 @@ int arrayFindSmallest(int * array, int len)
 {
     int ind;
     int small = array[0];
-    int pos;
+    int pos = 0;
     
-    for(ind = 0; ind < len; ind++)
+    for(ind = 0; ind < len - 1; ind++)
     {
-      if(small < array[ind+1])
+      if(small <= array[ind + 1])
       {
         pos = ind;
         small = array[ind];
       }
+      else 
+      {
+        pos = ind + 1;
+        small = array[ind + 1];
+      }
     }
-    if(len==0)
-    {
-      small =0;
-    }
-
-    return small;
+    return pos;
 }

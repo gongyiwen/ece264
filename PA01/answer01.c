@@ -43,7 +43,7 @@ int arrayIsIncreasing(int * array, int len)
 int arrayIndexRFind(int needle, const int * haystack, int len)
 {
     int ind;
-    int pos;
+    int pos = -1;
     for(ind = 0;ind < len;ind++)
     {
       if(haystack[ind] == needle)
@@ -64,17 +64,12 @@ int arrayFindSmallest(int * array, int len)
     int small = array[0];
     int pos = 0;
     
-    for(ind = 0; ind < len - 1; ind++)
+    for(ind = 0; ind < len; ind++)
     {
-      if(small <= array[ind + 1])
+      if(small <= array[ind])
       {
         pos = ind;
         small = array[ind];
-      }
-      else 
-      {
-        pos = ind + 1;
-        small = array[ind + 1];
       }
     }
     return pos;

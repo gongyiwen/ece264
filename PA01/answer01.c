@@ -50,10 +50,6 @@ int arrayIndexRFind(int needle, const int * haystack, int len)
       {
         pos = ind;
       }
-      if(haystack[ind] != needle && ind == len - 1)
-      {
-        pos = -1;
-      }
     }
     return pos;
  
@@ -67,7 +63,7 @@ int arrayFindSmallest(int * array, int len)
     
     for(ind = 0; ind < len; ind++)
     {
-      if(small < array[ind])
+      if(small > array[ind])
       {
         pos = ind;
         small = array[ind];

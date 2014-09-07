@@ -4,9 +4,13 @@
 
 size_t my_strlen(const char *str)
 {
-  int len;
-  len = sizeof(str);
-  return len;
+  size_t ind = 0;
+  while(*str != '\0')
+  {
+    str++;
+    ind++;
+  }
+  return ind;
 }
 
 int my_countchar(const char * str, char ch)
@@ -43,8 +47,9 @@ char * my_strchr(const char * str, int ch)
   
 char * my_strrchr(const char * str, int ch)
 {
-  int len = my_strlen(str);
-  str = str + len;
+  int len; 
+  len = my_strlen(str);
+  str +=len;
   int ind;
   for(ind = 0; ind < len + 1; ind++)
   {
@@ -59,53 +64,60 @@ char * my_strrchr(const char * str, int ch)
 
 char * my_strstr(const char * haystack, const char * needle)
 {
-  int len1 = my_strlen(haystack);
-  int len2 = my_strlen(needle);
-  int ind1;
-  int ind2;
-  int count;
+  int len1;
+  len1= my_strlen(haystack);
+  int len2;
+  len2 = my_strlen(needle);
+  int count= 0;
+  const char * a = needle;
   if(*needle != '\0')
   {  
-    for(ind1 = 0; ind1 < len1 + 1; ind1++)
+    while(*haystack)
     {
-      for(ind2 = 0; ind2 < len2 + 1; ind2++)
-      {
-	count = 0;
-	while(needle[ind2] == haystack[ind1])
+	while((* needle== *haystack)&&(*needle))
 	{
-	  ind1++;
-	  ind2++;
+	  haystack++;
+	  needle++;
 	  count++;
-	  if(count == len2)
-	  {
-	    haystack = haystack + ind1;
-	    return (char*) haystack;
-	  }
 	}
-      }
+	if(count == len2)
+	{
+	  return (char*) (haystack-=len2);
+	}
+	else
+	{
+	  needle = a;
+	  count = 0;
+	  haystack++;
+	}
     }
-    return NULL;
+      return NULL;
   }
   return (char*) haystack;
 }
 
 char * my_strcpy(char * dest, const char * src)
 {
-  int len = my_strlen(src);
+  int len;
+  len = my_strlen(src);
   int ind = 0;
   while( ind < len + 1)
   {
-    dest[ind] = src[ind];
+    *dest = *src;
+    dest++;
+    src++;
     ind++;
   }
-  dest = dest - len;
-  return dest;
+  dest -=ind;
+  return (char*)dest;
 }
 
 char * my_strcat(char * dest, const char * src)
 {
-  int len1 = my_strlen(src);
-  int len2 = my_strlen(dest);
+  int len1;
+  len1 = my_strlen(src);
+  int len2;
+  len2 = my_strlen(dest);
   int ind = 0;
   dest = dest + len2;
   while(ind < len1 + 1)
@@ -115,7 +127,7 @@ char * my_strcat(char * dest, const char * src)
     dest++;
   }
   dest = dest -len1-len2;
-  return dest;
+  return (char*) dest;
 }
 
 int my_isspace(int ch)
@@ -130,21 +142,22 @@ int my_isspace(int ch)
 int my_atoi(const char * str)
 {
   int ret = 0;
-  int len = my_strlen(str);
+  int len;
+  len = my_strlen(str);
   int sign = 1;
   int ind;
-  for(ind = 0; ind < len; ind++);
+  for(ind = 0; ind < len; ind++)
   {
-    if((*str >= 9 && *str <=13) ||*str ==32)
+    if((*str >= 9 && *str <= 13) ||*str != 32)
     {
       if(*str == '-')
       {
 	sign = -1;
       }
-      elseif(*str >= '0' && *str <= '9')
+      else if(*str >= '0' && *str <= '9')
       {
-	ret =ret *10;
-	ret = ret + (*str - '0');
+	ret *=10;
+	ret +=(*str - '0');
       }
     }
     str++;

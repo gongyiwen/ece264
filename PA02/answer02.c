@@ -119,14 +119,11 @@ char * my_strcat(char * dest, const char * src)
   int len2;
   len2 = my_strlen(dest);
   int ind = 0;
-  dest = dest + len2;
   while(ind < len1 + 1)
   {
-    *dest = src[ind];
+    dest[len2+ind] = src[ind];
     ind++;
-    dest++;
   }
-  dest = dest -len1-len2;
   return (char*) dest;
 }
 

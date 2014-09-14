@@ -4,8 +4,6 @@
 
 char * strcat_ex(char * * dest, int * n, const char * src)
 {
-  int src_len = strlen(src);
-  int dst_len = strlen(*dest);
   if( (*dest == NULL) )
   {
     *n = 1 + 2 * strlen(src);
@@ -13,17 +11,17 @@ char * strcat_ex(char * * dest, int * n, const char * src)
     *buffer = '\0';
     strcat(buffer,src);
     free(*dest);
+    *dest = buffer;
   }
-  else if((src_len + dst_len + 1) > *n)
+  else if((strlen(src) + strlen(*dest) + 1) > *n)
   {
     *n = 1 + 2 * (strlen(*dest) + strlen(src));
     char *buffer= malloc(sizeof(char) * (*n));
     *buffer = '\0';
-    strcpy(buffer,*dest);
-    strcat(*dest,src);
+    strcat(buffer,*dest);
+    strcat(buffer,src);
     free(*dest);
     *dest = buffer;
-    
   } 
   else
   {
@@ -34,19 +32,46 @@ char * strcat_ex(char * * dest, int * n, const char * src)
 
 char * * explode(const char * str, const char * delims, int * arrLen)
 {  
-  char * dest;
   int ind;
-  int len = strlen(str);
   int N = 0;
-  for(ind = 0;ind<len;ind++)
+  int arrInd = 0; // this is the next position where we'll create a string
+  int last = 0; // 1 + the last index we saw a delimiter. Init to 0.
+  for(ind = 0;ind<strlen(str);ind++)
   {
     if(strchr(delims, str[ind]) != NULL)
     {
-      N=N+1;
+      N++;
     }
-    char * * strArr = malloc((N+1) * sizeof(char *));//create the return array
-  memcpy(dest,src,strlen(src)+1);
-  return ;
+  }
+  *arrLen = N+1; 
+  char * * strArr = malloc((*arrLen) * sizeof(char *));//create the return array
+  if(N != 0)
+  {
+    while(arrInd < N)
+    {
+      for(ind = 0; ind <strlen(str) ; ind++)
+      {
+	if(strchr(delims, str[ind]) != NULL)
+	{
+	  strArr[arrInd] = malloc(sizeof(char) * (ind-last+1));
+	  memcpy(strArr[arrInd],str+last,ind-last);
+	  strArr[arrInd][ind-last] = '\0';
+	  last = ind + 1;
+	  arrInd++;
+	}
+      }
+    }
+    strArr[arrInd] = malloc(sizeof(char) * (ind-last+1));
+    memcpy(strArr[arrInd],str+last,ind-last);
+    strArr[arrInd][ind-last] = '\0';
+  }
+  else
+  {
+    strArr[arrInd] = malloc(sizeof(char) * (ind-last+1));
+    memcpy(strArr[arrInd],str+last,ind-last);
+    strArr[arrInd][ind-last] = '\0';
+  }
+  return strArr;
 }
 
 

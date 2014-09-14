@@ -6,12 +6,12 @@ char * strcat_ex(char * * dest, int * n, const char * src)
 {
   if( (*dest == NULL) )
   {
-    *n = 1 + 2 * strlen(src);
+    *n = 1 + 2 * strlen(src);//it is invalid to use strlen(*dest) if dest is NULL
     char *buffer= malloc(sizeof(char) * (*n));
-    *buffer = '\0';
+    *buffer = '\0';//make buffer an empty string
     strcat(buffer,src);
     free(*dest);
-    *dest = buffer;
+    *dest = buffer;//point dest to the beginning of buffer
   }
   else if((strlen(src) + strlen(*dest) + 1) > *n)
   {
@@ -43,7 +43,7 @@ char * * explode(const char * str, const char * delims, int * arrLen)
       N++;
     }
   }
-  *arrLen = N+1; 
+  *arrLen = N+1; //if there is one delim, there should be two arrays in the string.
   char * * strArr = malloc((*arrLen) * sizeof(char *));//create the return array
   if(N != 0)
   {
@@ -61,7 +61,7 @@ char * * explode(const char * str, const char * delims, int * arrLen)
 	}
       }
     }
-    strArr[arrInd] = malloc(sizeof(char) * (ind-last+1));
+    strArr[arrInd] = malloc(sizeof(char) * (ind-last+1));//To create the array for the last word
     memcpy(strArr[arrInd],str+last,ind-last);
     strArr[arrInd][ind-last] = '\0';
   }

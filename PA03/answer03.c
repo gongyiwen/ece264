@@ -105,9 +105,7 @@ void sortStringArray(char * * arrString, int len)
 
 
 int sortfunc1(const void *a, const void *b)
-{strArr[arrInd] = malloc(sizeof(char) * (ind-last+1));
-      memcpy(strArr[arrInd],str+last,ind-last);
-      strArr[arrInd][ind-last] = '\0';
+{
   const char a1 = *(char*)a;//single character 
   const char b1 = *(char*)b;
   return((int)a1 - (int)b1);

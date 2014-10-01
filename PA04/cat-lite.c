@@ -4,7 +4,36 @@
 
 int open(char *name,FILE* output)
 {
-
+  FILE* input;
+  int ch;
+  if(strcmp(name,"-") == 0)
+  {
+    input = stdin;
+    do
+    {
+      ch = fgetc(input);
+      if(ch != EOF)
+      {
+	fputc(ch,output);
+      }
+    }while(ch != EOF);
+  }
+  
+  else 
+  {
+    input = fopen(name,"r");
+    if(input == NULL){
+      return 0;}
+    do
+    {
+      ch = fgetc(input);
+      if(ch != EOF)
+      {
+	fputc(ch,output);
+      }
+    }while(ch != EOF);
+  fclose(input);
+  }
   return 1;
 }
       

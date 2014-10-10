@@ -55,7 +55,7 @@ void partitionIncrefunc(int value, int *arr, int pos)
     arr[pos] = ind;
     if(pos > 0)
     {
-      if(arr[pos] < arr[pos + 1]) //is increasing
+      if(arr[pos] > arr[pos - 1]) //is increasing,must compare with pos -1, pos + 1 has not been created yet
       {
         partitionIncrefunc(value - ind, arr, pos+1);
       }
@@ -93,7 +93,7 @@ void partitionDecrefunc(int value, int *arr, int pos)
     }
     else
     {
-      if(arr[pos] > arr[pos + 1]) //is decreasing
+      if(arr[pos] < arr[pos - 1]) //is decreasing
       {
       partitionDecrefunc(value - ind, arr, pos+1);
       }
@@ -117,13 +117,10 @@ void partitionOddfunc(int value, int *arr, int pos)
     return;
   }
   int ind;
-  for(ind = 1; ind <= value; ind ++)
+  for(ind = 1; ind <= value; ind +=2)
   {
-    if((ind % 2) != 0)
-    {
       arr[pos] = ind;
       partitionOddfunc(value - ind, arr, pos+1);
-    }
   }
 }
       
@@ -177,7 +174,7 @@ void partitionOddEvenfunc(int value,int *arr,int pos)
     }
     else
     {
-      if((arr[pos] % 2) != (arr[pos-1] %2))
+      if((arr[pos] % 2) != (arr[pos - 1] %2))
       {
         arr[pos] = ind;
         partitionOddEvenfunc(value - ind, arr, pos+1);
@@ -194,7 +191,7 @@ void partitionOddAndEven(int value)
   free(arr);
 }
 
-int Prime(int value)
+int Prime(int value)//Check if the number is prime
 {
   int ind;
   for(ind =2; ind < value;ind++)

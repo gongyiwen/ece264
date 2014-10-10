@@ -119,11 +119,7 @@ void partitionOddfunc(int value, int *arr, int pos)
   int ind;
   for(ind = 1; ind <= value; ind ++)
   {
-    if((ind % 2) == 0)
-    {
-      return;
-    }
-    else
+    if((ind % 2) != 0)
     {
       arr[pos] = ind;
       partitionOddfunc(value - ind, arr, pos+1);
@@ -149,11 +145,7 @@ void partitionEvenfunc(int value, int *arr, int pos)
   int ind;
   for(ind = 1; ind <= value; ind ++)
   {
-    if((ind % 2) != 0)
-    {
-      return;
-    }
-    else
+    if((ind % 2) == 0)
     {
       arr[pos] = ind;
       partitionEvenfunc(value - ind, arr, pos+1);

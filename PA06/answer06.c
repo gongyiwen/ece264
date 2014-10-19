@@ -3,81 +3,44 @@
 #include <string.h>
 #include "answer06.h"
 
-// int canMove(char** maze,  int row, int column,int dir)/row, col is the current position 
-// switch(dir)
-// {
-//   case North:
-//     row --;
-//     break;
-//   case South:
-//     row ++;
-//     break;
-//   case West:
-//     column --;
-//     break;
-//   case East:
-//     column ++;
-//     break;
-//   int dest = maze[row][column];
-//   if (dest == ' ')
-//   {  return 1;}
-//   return 0;//not able to move to that dir
-// }
-// 
-// 
-// void getout(char** maze, int row,int column,int dir, int * mode)
-//   if(canMove(maze,row,column,EAST) && (dir != WEST))
-//   {
-//     (*mode) = FORWARD;
-//     getout(maze,row,column+1,EAST,mode);
-//   }
-//   if(canMove(maze,row,column,SOUTH) && (dir != NORTH))
-//   {
-//     (*mode) = FORWARD;
-//     getout(maze,row+1,column,SOUTH,mode);
-//   }
-//   if(canMove(maze,row,column,WEST) && (dir != EAST))
-//   {
-//     (*mode) = FORWARD;
-//     getout(maze,row,column-1,WEST,mode);
-//   }
-//   if(canMove(maze,row,column,NORTH) && (dir != SOUTH))
-//   {
-//     (*mode) = FORWARD;
-//     getout(maze,row-1,column,NORTH,mode);
-//   }
-//   (*mode) = BACKWARD;
-// }
-void traverseMaze(char** maze, int x, int y )
+void traverseMaze(char** maze, int x, int y ,int w,int h)
 {
+  while(((x <  h) && (x > -1)) && ((y < w) &&( y > -1)))
+  {
     maze[x][y]++; /* mark square as used */
-    if( !maze[x][y-1] ) 
+    if( maze[x][y-1] == SPACE ) 
     {
-      traverseMaze(maze,x, y-1 );
+      traverseMaze(maze,x, y-1,w,h );
+      printf("%c %d\n",'W','1');
     }
-    if( !maze[x+1][y] ) 
-    {traverseMaze(maze, x+1, y );}
-    if( !maze[x][y+1] ) 
-    {traverseMaze(maze, x, y+1 );}
-    if( !maze[x-1][y] ) 
-    {traverseMaze(maze x-1, y );}
+    if( maze[x+1][y] == SPACE ) 
+    {
+      traverseMaze(maze, x+1, y,w,h );
+      printf("%c %d\n",'S','1');
+    }
+    if( maze[x][y+1] == SPACE ) 
+    {
+      traverseMaze(maze, x, y+1,w,h );
+      printf("%c %d\n",'E','1');
+    }
+    if( maze[x-1][y] == SPACE ) 
+    {
+      traverseMaze(maze x-1, y,w,h );
+      printf("%c %d\n",'N','1');
+    }
+  }
 }
 
 void print_directions(char** maze, int w, int h)
 {
-  int row = 0;
   int column;
-  int pos;
     //find the entrance
-  for(column = 0;column < w;column++)
+  while(maze[0][column] !=' ')
   {
-    if(maze[row][column] == ' ')
-    {
-      maze[row][column] = '*';
-    }
+   column++;
   }
-  getout(maze,row,column,SOUTH,FORWARD);
-  printf("%c %d\n",direction,n);
+  traverseMaze(maze,0,column,w,h);
+  //return EXIT_SUCCESS;
 }
 
 

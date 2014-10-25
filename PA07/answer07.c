@@ -3,18 +3,17 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdint.h>
-#include <libgen.h>
 #include <string.h>
 
 
 Image * Image_load(const char * filename)
 {
     FILE * fp = NULL;
-    size_t read;
     ImageHeader header;
-    Image * ece264_im = NULL, * im = NULL;
+    Image * ece264_im = NULL;
+    Image * im = NULL;
     int err = 0;
+    size_t read;
 
     fp = fopen(filename, "rb");
     if(!fp) {
@@ -23,19 +22,28 @@ Image * Image_load(const char * filename)
 	}
 
     if(!err) { // Read the header
-	read = fread(&header, sizeof(ImageHeader), 1, fp);
-	if(read != 1) 
-	{
-	  err = 1;
-	}
-	if(header.magic_number != ECE264_IMAGE_MAGIC_NUMBER)
-	{
-	  err = 1;
-	}
-	if((header.width == 0) || (header.height == 0) || (header.comment_len = 0))
-	{
-	  err = 1;
-	}
+	read = fread(&header, sizeof(ImageHeader),1, fp);
+	err = read !=1 || (header.magic_number != ECE264_IMAGE_MAGIC_NUMBER) || header.width == 0 || header.height == 0 || header.comment_len == 0;
+// 	if(read != 1) 
+// 	{
+// 	  err = 1;
+// 	}
+// 	if(header.magic_number != ECE264_IMAGE_MAGIC_NUMBER)
+// 	{
+// 	  err = 1;
+// 	}
+// 	if(header.width == 0)
+// 	{
+// 	  err = 1;
+// 	}
+// 	if(header.height == 0)
+// 	{
+// 	  err = 1;
+// 	}
+// 	if(header.comment_len == 0)
+// 	{
+// 	  err = 1;
+// 	}
 	if(err)
 	{
 	  fprintf(stderr, "Failed to read header from '%s'\n", filename);
@@ -44,10 +52,12 @@ Image * Image_load(const char * filename)
 
     if(!err) { // Allocate Image struct
 	ece264_im = malloc(sizeof(Image));			
-	if(ece264_im == NULL) {
+	if(ece264_im == NULL) 
+	{
 	    fprintf(stderr, "Failed to allocate im structure\n");
-	    err = 1;}
-	} 
+	    err = 1;
+	}
+    } 
 
     if(!err) { // Initiate the Image struct
 	ece264_im->width = header.width;
@@ -56,19 +66,23 @@ Image * Image_load(const char * filename)
 	ece264_im -> data = malloc(sizeof(uint8_t)*header.width*header.height);
 	if(ece264_im ->comment == NULL)
 	{
-	  fprintf(stderr,"Failed to allocate comment\n");}
+	  fprintf(stderr,"Failed to allocate comment\n");
+	  err = 1;
+	}
 	if(ece264_im ->data == NULL)
 	{
 	  fprintf(stderr,"Failed to allocate data\n");
+	  err = 1;
 	}
     }
     
     if(!err)//Read the comment
     {
       read = fread(ece264_im -> comment,sizeof(char),header.comment_len,fp);//read the entire comment
-      err = ((read != header.comment_len) || (ece264_im->comment[header.comment_len - 1] != '\0'));
-      if(err){
+      if((read != header.comment_len) || (ece264_im->comment[header.comment_len - 1] != '\0'))
+      {
 	fprintf(stderr,"Failed to read entire comment\n");
+	err = 1;
       }
     }
     
@@ -141,7 +155,7 @@ void linearNormalization(int width, int height, uint8_t * intensity)
   int max=intensity[0];
   int min=intensity[0];
   int ind;
-  for(ind = 0;ind < total;ind++);
+  for(ind = 0;ind < total;ind++)
   {
     if(intensity[ind]< min)
     {

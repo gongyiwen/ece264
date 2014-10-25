@@ -24,26 +24,6 @@ Image * Image_load(const char * filename)
     if(!err) { // Read the header
 	read = fread(&header, sizeof(ImageHeader),1, fp);
 	err = read !=1 || (header.magic_number != ECE264_IMAGE_MAGIC_NUMBER) || header.width == 0 || header.height == 0 || header.comment_len == 0;
-// 	if(read != 1) 
-// 	{
-// 	  err = 1;
-// 	}
-// 	if(header.magic_number != ECE264_IMAGE_MAGIC_NUMBER)
-// 	{
-// 	  err = 1;
-// 	}
-// 	if(header.width == 0)
-// 	{
-// 	  err = 1;
-// 	}
-// 	if(header.height == 0)
-// 	{
-// 	  err = 1;
-// 	}
-// 	if(header.comment_len == 0)
-// 	{
-// 	  err = 1;
-// 	}
 	if(err)
 	{
 	  fprintf(stderr, "Failed to read header from '%s'\n", filename);

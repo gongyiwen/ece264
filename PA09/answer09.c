@@ -100,9 +100,7 @@ BusinessNode * load_tree_from_file(char * filename)
     char * * strArr = explode(ch);
     //printf("%s %s %s\n",strArr[0],strArr[1],strArr[2]);
     BusinessNode * node = create_node(strArr[0],strArr[1],strArr[2]);
-    //free(strArr[0]);
-    //free(strArr[1]);
-    //free(strArr[2]);
+
     //free(ch);
     free(strArr);
     root = tree_insert(node, root);
@@ -114,7 +112,7 @@ BusinessNode * load_tree_from_file(char * filename)
      
 BusinessNode * tree_search_name(char * name, BusinessNode * root)
 {
-  BusinessNode * find = NULL;
+  BusinessNode * node = NULL;
   if(root == NULL)
   {
     return NULL;
@@ -125,13 +123,13 @@ BusinessNode * tree_search_name(char * name, BusinessNode * root)
   }
   if(strcmp(name, root -> name) < 0)
   {
-    find = tree_search_name(name, root -> left);
+    node = tree_search_name(name, root -> left);
   }
   if(strcmp(name, root -> name) > 0)
   {
-    find = tree_search_name(name,root -> right);
+    node = tree_search_name(name,root -> right);
   }
-  return find;
+  return node;
   /*
   if(root == NULL)
   {

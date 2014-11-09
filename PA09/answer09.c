@@ -117,7 +117,7 @@ BusinessNode * tree_search_name(char * name, BusinessNode * root)
   {
     return NULL;
   }
-  if(strcmp(name, root -> name) ==0)
+  if(strcmp(name, root -> name) == 0)
   {
     return root;
   }

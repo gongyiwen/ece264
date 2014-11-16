@@ -4,8 +4,9 @@
 #include <string.h>
 
 struct YelpDataBST{
+  struct Business** Business;
   
-}
+};
 /* You define this struct in your answerXX.c file.  There are different ways
  * you might choose to structure it.  This object is probably NOT the root
  * node of the tree, although it might be an attribute of this object.

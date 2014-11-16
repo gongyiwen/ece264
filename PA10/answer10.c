@@ -95,6 +95,14 @@ char * * explode(char * str)
   return strArr;
 }
 
+struct Review * create_rev(char* text,uint8_t stars)
+{
+  struct Review * rev = malloc(sizeof(Review));
+  rev -> text = strdup(text);
+  rev -> stars = stars;
+  return rev;
+}
+
 struct Location * create_location(char * add, char * city, char* state, char * zip)
 {
   struct Location * pos = malloc(sizeof(Location));
@@ -102,14 +110,14 @@ struct Location * create_location(char * add, char * city, char* state, char * z
   pos -> city = strdup(city);
   pos -> state = strdup(state);
   pos -> zip_code = strdup(zip);
-
-  
+  return pos;
 }
-struct Review * create_rev(char* text,uint8_t stars)
+
+struct Business * create_bus(char * name)
 {
-  struct Review * rev = malloc(sizeof(Review));
-  rev -> text = strdup(text);
-  rev -> stars = stars;
+  struct Business * biz = malloc(sizeof(Business));
+  biz -> name = strdup(name);
+  return biz;
 }
 
 struct YelpDataBST* create_business_bst(const char* businesses_path,
@@ -120,9 +128,9 @@ struct YelpDataBST* create_business_bst(const char* businesses_path,
   struct YelpDataBST * bst = NULL;
   bst = malloc(sizeof(struct YelpDataBST));
   int ID = 0;
-  int ind = 0;
   while(! feof(revfptr))
   {
+    int ind = 0;
     char ch[3005];
     fgets(ch, 3000, revfptr);
     char * * strArr = explode(ch);
@@ -133,16 +141,20 @@ struct YelpDataBST* create_business_bst(const char* businesses_path,
       fgets(dh, 500,bizfptr);
       char ** strBrr = explode(dh);
       if(ind == 0)
-      {
-        struct Location * pos = create_location(strBrr[2],strBrr[3],strBrr[4],strBrr[5],rev,ind+1);
+      {                                         //add      city     state      zipcode
+        struct Location * pos = create_location(strBrr[2],strBrr[3],strBrr[4],strBrr[5]);
       }
-      pos -> reviews[ind] = rev;
-      pos -> num_reviews = ind+1;
+      pos -> reviews[ind] = rev;//array of reviews
+      pos -> num_reviews = ind+1;//number of reviews
       ind++;
     }while((strArr[0] == strBrr[0]) && !feof(bizfptr))
+    struct Business * bus = create_bus(strBrr[1],pos,1);//name
+    Tree_insert(bus);
+    Treenode * head = malloc(sizeof(Treenode));
+    
+  }
 
-  Tree_insert();
-  Treenode * head = malloc(sizeof(Treenode));
+
   
   bst -> head = head;
     

@@ -25,12 +25,93 @@ Treenode * Treenode_create(Business * business)
   return(tn);
 }
 
-Treenode * Treeinsert(Treenode * tn, Business * business)
+Treenode * Tree_insert(Treenode * tn, Business * business)
 {
-  if(
+  if(tn == 0)
+  {
+    return(Treenode_create(business);
+  }
+  if((business -> name) < ((tn -> business )-> name))
+  {
+    tn -> left = Tree_insert(tn -> left, business);
+  }
+  if((business -> name) >((tn -> business) -> name))
+  {
+    tn -> right = Tree_insert(tn -> right, business);
+  }
+  if((business -> name) ==((tn -> business) -> name))
+  {
+    (tn -> business) -> locations[1] = 
+    
 }
 
   
+char * * explode(char * str)
+{  
+  int ind;
+  int N = 0;
+  int arrInd = 0; // this is the next position where we'll create a string
+  int last = 0; // 1 + the last index we saw a delimiter. Init to 0.
+  if(str == NULL)
+  {
+    return NULL;
+  }
+  for(ind = 0;ind < strlen(str);ind++)
+  {
+    if(str[ind]=='\t')
+    {
+      N++;
+    }
+  }
+  int arrLen = N+1; //if there is one delim, there should be two arrays in the string.
+  //printf("arrLen = %d",arrLen);
+  char * * strArr = malloc((arrLen) * sizeof(char *));//create the return array
+  if(N != 0)
+  {
+    while(arrInd < N)
+    {
+      for(ind = 0; ind <strlen(str) ; ind++)
+      {
+	if(str[ind] == '\t')
+	{
+	  strArr[arrInd] = malloc(sizeof(char) * (ind-last+1));
+	  memcpy(strArr[arrInd],str+last,ind-last);
+	  strArr[arrInd][ind-last] = '\0';
+	  last = ind + 1;
+	  arrInd++;
+	}
+      }
+    }
+    strArr[arrInd] = malloc(sizeof(char) * (ind-last+1));//To create the array for the last word
+    memcpy(strArr[arrInd],str+last,ind-last);
+    strArr[arrInd][ind-last] = '\0';
+  }
+  else
+  {
+    strArr[arrInd] = malloc(sizeof(char) * (ind-last+1));
+    memcpy(strArr[arrInd],str+last,ind-last);
+    strArr[arrInd][ind-last] = '\0';
+  }
+  return strArr;
+}
+
+struct Location * create_location(char * add, char * city, char* state, char * zip)
+{
+  struct Location * pos = malloc(sizeof(Location));
+  pos -> address = strdup(add);
+  pos -> city = strdup(city);
+  pos -> state = strdup(state);
+  pos -> zip_code = strdup(zip);
+
+  
+}
+struct Review * create_rev(char* text,uint8_t stars)
+{
+  struct Review * rev = malloc(sizeof(Review));
+  rev -> text = strdup(text);
+  rev -> stars = stars;
+}
+
 struct YelpDataBST* create_business_bst(const char* businesses_path,
                                         const char* reviews_path)
 {  
@@ -38,7 +119,29 @@ struct YelpDataBST* create_business_bst(const char* businesses_path,
   FILE* revfptr = fopen(reviews_path,"r");
   struct YelpDataBST * bst = NULL;
   bst = malloc(sizeof(struct YelpDataBST));
-  Treeinsert();
+  int ID = 0;
+  int ind = 0;
+  while(! feof(revfptr))
+  {
+    char ch[3005];
+    fgets(ch, 3000, revfptr);
+    char * * strArr = explode(ch);
+    struct Review * rev = create_rev(strArr[5],strArr[1]);
+    do
+    {
+      char dh[520];
+      fgets(dh, 500,bizfptr);
+      char ** strBrr = explode(dh);
+      if(ind == 0)
+      {
+        struct Location * pos = create_location(strBrr[2],strBrr[3],strBrr[4],strBrr[5],rev,ind+1);
+      }
+      pos -> reviews[ind] = rev;
+      pos -> num_reviews = ind+1;
+      ind++;
+    }while((strArr[0] == strBrr[0]) && !feof(bizfptr))
+
+  Tree_insert();
   Treenode * head = malloc(sizeof(Treenode));
   
   bst -> head = head;

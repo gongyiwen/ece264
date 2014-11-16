@@ -13,15 +13,36 @@ struct YelpDataBST{
    FILE * businesses;
    FILE * reviews;
    Treenode * head;
+   int len;//file offset of the same business from the head of the tree
 };
 
+Treenode * Treenode_create(Business * business)
+{
+  Treenode * tn = malloc(sizeof(Treenode));
+  tn -> left = NULLl
+  tn -> right = NILL;
+  tn -> business = business;
+  return(tn);
+}
 
+Treenode * Treeinsert(Treenode * tn, Business * business)
+{
+  if(
+}
+
+  
 struct YelpDataBST* create_business_bst(const char* businesses_path,
                                         const char* reviews_path)
 {  
-  FILE* business = fopen(businesses_path,"r");
-  FILE* reviews = fopne(reviews_path,"r");
+  FILE* bizfptr = fopen(businesses_path,"r");
+  FILE* revfptr = fopen(reviews_path,"r");
+  struct YelpDataBST * bst = NULL;
+  bst = malloc(sizeof(struct YelpDataBST));
+  Treeinsert();
+  Treenode * head = malloc(sizeof(Treenode));
   
+  bst -> head = head;
+    
 }
 
 					  
@@ -57,7 +78,19 @@ struct Business* get_business_reviews(struct YelpDataBST* bst,
  */
 
 
-void destroy_business_bst(struct YelpDataBST* bst);
+void destroy_business_bst(struct YelpDataBST* bst)
+{
+  if(bst -> head == NULL) 
+  {
+    fclose(bst -> businesses);
+    fclose(bst -> reviews);
+    return;
+  }
+  destory_business_bst((bst -> head) -> left);
+  destory_business_bst((bst -> head) -> right);
+  free(bst -> head);
+}
+  
 /* Deallocate all memory allocated for the object returned
  * by create_business_bst(..) and close the files. */
 

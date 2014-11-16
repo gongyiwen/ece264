@@ -3,31 +3,33 @@
 #include <stdio.h>
 #include <string.h>
 
+typedef struct treenode{
+  struct treenode* left;
+  struct treenode* right;
+  struct Business* business;
+}Treenode;
+
 struct YelpDataBST{
-  struct Business** Business;
-  
+   FILE * businesses;
+   FILE * reviews;
+   Treenode * head;
 };
-/* You define this struct in your answerXX.c file.  There are different ways
- * you might choose to structure it.  This object is probably NOT the root
- * node of the tree, although it might be an attribute of this object.
- */
+
 
 struct YelpDataBST* create_business_bst(const char* businesses_path,
-                                        const char* reviews_path);
+                                        const char* reviews_path)
+{  
+  FILE* business = fopen(businesses_path,"r");
+  FILE* reviews = fopne(reviews_path,"r");
+  
+}
+
+					  
 /* This function reads the two files and creates an index that can be used
  * to search the data and quickly retrieve the reviews.  You must *not* store
  * all of the review text in memory.  Your structure should store the file
  * offsets where the review text can be found.
- *
- * businesses_path - path to the businesses.tsv file provided for this assignment.
- * reviews_path - path to the businesses.tsv file provided for this assignment.
- *     When running on ecegrid, you can pass the following:
- *        /home/shay/a/ece264p0/share/yelp_data/businesses.tsv
- *        /home/shay/a/ece264p0/share/yelp_data/reviews.tsv
- *
- * DO NOT COPY THOSE FILES TO YOUR HOME DIRECTORY.  PLEASE ACCESS THEM USING
- * THOSE PATHS.  THESE ARE LARGE FILES AND WE DO NOT WANT TO FILL THE DISK
- * WITH MULTIPLE COPIES OF THEM.
+
  */
 
 struct Business* get_business_reviews(struct YelpDataBST* bst,

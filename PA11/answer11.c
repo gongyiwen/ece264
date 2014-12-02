@@ -100,18 +100,15 @@ void Stack_pushFront(Stack * stack, HuffNode * tree)
   stack -> head = sn;
 }
   
-
-// -------------------------------------------------------- Pop Pop combine Push
-
-/**
- * This function helps simplify building a Huffman Coding Tree from the header
- * information. It takes a stack as input. As a precondition, you can assume 
- * that the stack has at least two nodes. This function pops the front (top) 
- * two nodes, combines them into a single node, and pushes the new node back 
- * onto the stack. See Huffman_Coding.pdf to understand conceptually how this
- * should be done.
- */
-void Stack_popPopCombinePush(Stack * stack);
+void Stack_popPopCombinePush(Stack * stack)
+{
+  HuffNode * first = Stack_popFront(stack);
+  HuffNode * second = Stack_popFront(stack);
+  HuffNode * node = HuffNode_create(0);
+  node -> left = second;
+  node -> right = first;
+  Stack_pushFront(stack,node);
+}
 
 // ---------------------------------------------------- Reading HuffTree headers
 

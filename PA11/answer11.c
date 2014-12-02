@@ -11,28 +11,22 @@ HuffNode * HuffNode_create(int value)
   node -> left = NULL;
   return node;
 
-/**
- * Destroy a tree, including all sub-children. Must handle NULL values safely.
- */
-void HuffNode_destroy(HuffNode * tree);
+
+void HuffNode_destroy(HuffNode * tree)
+{
+  if(tree == NULL)
+  {
+    return;
+  }
+  HuffNode_destory(tree -> right);
+  HuffNode_destory(tree -> left);
+  free(tree);
+}
 
 // ----------------------------------------------------------------------- Stack
 
-/**
- * We need a "Stack" to build the tree structure that is used to decode
- * a Huffman encoding. Stacks are very simple to implement with linked lists.
- * We must implement the following functions (given below). Each of these 
- * functions should only be a few lines of code.
- *
- * (1) Stack_create();              // Allocate a brand new stack.
- * (2) Stack_destroy(stack);        // Clean up memory for the stack.
- * (3) Stack_isEmpty(stack);    // TRUE iff (if and only if) the stack is empty.
- * (4) Stack_pushFront(stack, tree); // Push a tree onto the stack.
- * (6) Stack_popFront(stack);  // Remove a tree from the stack and return it.
- *
- * Altogether, these six functions should be around 40 lines of code.
- */
-typedef struct StackNode_st
+
+/**typedef struct StackNode_st
 {
     HuffNode * tree;
     struct StackNode_st * next;
@@ -42,18 +36,38 @@ typedef struct Stack_st
 {
     StackNode * head; // head node of a linked-list
 } Stack;
+**/
 
-/**
- * Returns a pointer to a new empty stack struct
- */
-Stack * Stack_create();
+Stack * Stack_create()
+{
+  Stack * node = malloc(sizeof(Stack));
+  node -> head = NULL;
+  return(node);
+}
 
-/**
- * Frees all memory associated with the stack. 
- * Don't forget that you must free the entire contained linked-list.
- * Also, you must safely do nothing if stack == NULL. 
- */
-void Stack_destroy(Stack * stack);
+
+void Stack_destroy(Stack * stack)
+{
+  if(stack == NULL)
+  {
+    return;
+  }
+  StackNode * node = stack -> head;//no tree in stack head
+  StackNode * nx = node -> next;
+  while(node != NULL)
+  {
+    HuffNode_destory(nx-> tree);
+    free(nx);
+    node = nx;
+  }
+  free(node);
+
+  
+  
+}
+  Stack_destory(stack -> next);
+  free(stack);
+}
 
 /**
  * Returns TRUE (something other than zero) if the stack is empty.

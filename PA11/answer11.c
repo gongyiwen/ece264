@@ -18,8 +18,8 @@ void HuffNode_destroy(HuffNode * tree)
   {
     return;
   }
-  HuffNode_destory(tree -> right);
-  HuffNode_destory(tree -> left);
+  HuffNode_destroy(tree -> right);
+  HuffNode_destroy(tree -> left);
   free(tree);
 }
 
@@ -56,7 +56,7 @@ void Stack_destroy(Stack * stack)
   StackNode * nx = stack -> head -> next;
   while(node != NULL)
   {
-    HuffNode_destory(nx-> tree);
+    HuffNode_destroy(nx-> tree);
     free(nx);
     node = nx;
   }
@@ -115,7 +115,50 @@ void Stack_popPopCombinePush(Stack * stack)
 /**
  * Read a Huffman Coding Tree (in text format) from 'fp'.
  */
-HuffNode * HuffTree_readTextHeader(FILE * fp);
+int SizeofStack(Stack * stack)
+{
+  if(stack ==NULL)
+  {
+    return 0;
+  }
+  int ind = 0;
+  StackNode * sn = stack -> head;
+  while(sn != NULL)
+  {
+    ind++;
+    sn = sn -> next;
+  }
+  return ind;
+}
+  
+HuffNode * HuffTree_readTextHeader(FILE * fp)
+{
+  int c;
+  Stack* sk = Stack_create();
+  while((c = fgetc(fp)) != EOF)
+  {
+    if(c == '1')
+    {
+      c = fgetc(fp);
+      HuffNode * tree = HuffNode_create(c);
+      Stack_pushFront(sk,tree);
+    }
+    else if( c =='0')
+    {
+      if(sizeofStack(sk) == 1)
+      {
+	break;
+      }
+      Stack_popPopCombinePush(sk);
+    }
+  }
+  Huffnode * tn = Stack_popFront(stack);
+  Stack_destroy(stack);
+  return tn;
+}
+    
+    
+  
 
 /**
  * Read a Huffman Coding Tree (in binary format) from 'fp'.

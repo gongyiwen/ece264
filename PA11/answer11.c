@@ -53,45 +53,53 @@ void Stack_destroy(Stack * stack)
     return;
   }
   StackNode * node = stack -> head;//no tree in stack head
-  StackNode * nx = node -> next;
+  StackNode * nx = stack -> head -> next;
   while(node != NULL)
   {
     HuffNode_destory(nx-> tree);
     free(nx);
     node = nx;
   }
-  free(node);
-
-  
-  
-}
-  Stack_destory(stack -> next);
-  free(stack);
+  free(stack); 
 }
 
-/**
- * Returns TRUE (something other than zero) if the stack is empty.
- */
-int Stack_isEmpty(Stack * stack);
 
-/**
- * Pop the front (top) 'value' (i.e. Huffman tree) from the stack.
- *
- * More precisely, this function must do three things:
- * (1) Save the value (i.e. Huffman tree) of the head node of the stack's list
- * (2) Remove the head node of the stack's list, freeing it.
- * (3) Return the value (i.e. Huffman tree) saved in (1).
- */
-HuffNode * Stack_popFront(Stack * stack);
+int Stack_isEmpty(Stack * stack)
+{
+  if(stack/*->head*/ == NULL)
+  {
+    return 1;
+  }
+  return 0;
+}
 
-/**
- * Push a 'value' (i.e. Huffman tree) onto the front (top) of the stack.
- *
- * More precisely, this function must do two things:
- * (1) Create a new StackNode with 'tree' for its tree.
- * (2) Push that new StackNode onto the front of the stack's list.
- */
-void Stack_pushFront(Stack * stack, HuffNode * tree);
+
+HuffNode * Stack_popFront(Stack * stack)
+{
+  if(Stack_isEmpty(stack))//if empty, return
+  {
+    return;
+  }
+  HuffNode * tn = stack -> head -> tree;
+  StackNode * a = stack -> head;
+  stack -> head = stack -> head -> next;
+  free(a);
+  return(tn);
+}
+
+
+void Stack_pushFront(Stack * stack, HuffNode * tree)
+{
+  if(stack == NULL)
+  {
+    return;
+  }
+  StackNode* sn = malloc(sizeof(StackNode));
+  sn -> tree = tree;
+  sn -> next = stack -> head;
+  stack -> head = sn;
+}
+  
 
 // -------------------------------------------------------- Pop Pop combine Push
 

@@ -52,12 +52,13 @@ void Stack_destroy(Stack * stack)
   {
     return;
   }
-  StackNode * node = stack -> head;//no tree in stack head
-  StackNode * nx = stack -> head -> next;
+  StackNode * node = stack -> head;
+  StackNode * nx = NULL;//next
   while(node != NULL)
   {
-    HuffNode_destroy(nx-> tree);
-    free(nx);
+    nx = node -> next;
+    HuffNode_destroy(node-> tree);
+    free(node);
     node = nx;
   }
   free(stack); 
@@ -72,8 +73,14 @@ int Stack_isEmpty(Stack * stack)
   }
   return 0;
 }
-
-
+/**
+ * Pop the front (top) 'value' (i.e. Huffman tree) from the stack.
+ *
+ * More precisely, this function must do three things:
+ * (1) Save the value (i.e. Huffman tree) of the head node of the stack's list
+ * (2) Remove the head node of the stack's list, freeing it.
+ * (3) Return the value (i.e. Huffman tree) saved in (1).
+ */
 HuffNode * Stack_popFront(Stack * stack)
 {
   if(Stack_isEmpty(stack))//if empty, return
@@ -87,7 +94,13 @@ HuffNode * Stack_popFront(Stack * stack)
   return(tn);
 }
 
-
+/**
+ * Push a 'value' (i.e. Huffman tree) onto the front (top) of the stack.
+ *
+ * More precisely, this function must do two things:
+ * (1) Create a new StackNode with 'tree' for its tree.
+ * (2) Push that new StackNode onto the front of the stack's list.
+ */
 void Stack_pushFront(Stack * stack, HuffNode * tree)
 {
   if(stack == NULL)
@@ -99,7 +112,14 @@ void Stack_pushFront(Stack * stack, HuffNode * tree)
   sn -> next = stack -> head;
   stack -> head = sn;
 }
-  
+  /**
+ * This function helps simplify building a Huffman Coding Tree from the header
+ * information. It takes a stack as input. As a precondition, you can assume 
+ * that the stack has at least two nodes. This function pops the front (top) 
+ * two nodes, combines them into a single node, and pushes the new node back 
+ * onto the stack. See Huffman_Coding.pdf to understand conceptually how this
+ * should be done.
+ */
 void Stack_popPopCombinePush(Stack * stack)
 {
   HuffNode * first = Stack_popFront(stack);
@@ -133,17 +153,17 @@ int SizeofStack(Stack * stack)
   
 HuffNode * HuffTree_readTextHeader(FILE * fp)
 {
-  int c;
+  int c=fgetc(fp);
   Stack* sk = Stack_create();
-  while((c = fgetc(fp)) != EOF)
+  while(!feof(fp))
   {
-    if(c == '1')
+    if(c == '1')//leaf node
     {
-      c = fgetc(fp);
+      c = fgetc(fp);//get the character
       HuffNode * tree = HuffNode_create(c);
       Stack_pushFront(sk,tree);
     }
-    else if( c =='0')
+    else if( c =='0')//non-leaf node
     {
       if(sizeofStack(sk) == 1)
       {
@@ -151,21 +171,81 @@ HuffNode * HuffTree_readTextHeader(FILE * fp)
       }
       Stack_popPopCombinePush(sk);
     }
+    c=fgetc(fp);
   }
   Huffnode * tn = Stack_popFront(stack);
   Stack_destroy(stack);
   return tn;
 }
     
-    
-  
-
 /**
  * Read a Huffman Coding Tree (in binary format) from 'fp'.
  * You will need to (conceptually) read a file a bit at a time. See the README
  * for hints on how to do this.
  */
-HuffNode * HuffTree_readBinaryHeader(FILE * fp);
 
-#endif
+typedef struct {
+  FILE * fp;
+  int position;
+  unsigned char byte;
+} Bits;
+
+Bits * Bits_create(FILE * fp)
+{
+  Bits * bit = malloc(sizeof(Bits));
+  bit -> fp = fp;
+  bit -> byte = 0;
+  bit -> pos = 8; // 1 byte is 8 bits
+return bit;
+}
+
+void Bits_destroy(BitFile * bit)
+{
+  free(bit);
+}
+
+int Bits_nbi(Bits * bit)
+{
+  if (bit -> pos == 8)
+  {
+    bit -> pos = 0;            //8 bits
+    if (fread(&(bit -> byte), sizeof(unsigned char), 1, bit -> fp) !=1)
+    {
+    return -1;
+    }
+  }
+  int val = (bit -> byte >> (7 - bit -> pos)) & 1;
+  (bit -> pos)++;
+  return val;
+}
+
+
+
+HuffNode * HuffTree_readBinaryHeader(FILE * fp)
+{
+  Stack * stack = Stack_create();
+  Bits * bit = Bits_create(fp);
+  int ind = Bits_nbi(bit);
+  while (ind >= 0)
+  {
+    if (ind == 1)
+    {
+      val = Bits_nby(bit);
+      Stack_pushFront(stack, HuffNode_create(ind));
+    }
+    else if (ind == 0)
+    {
+      if (Stack_size(stack) == 1)
+      {
+	break;
+      }
+      Stack_popPopCombinePush(stack);
+    }
+    val = Bits_nbi(bit);
+  }
+  HuffNode * tree = Stack_popFront(stack);
+  Stack_destroy(stack);
+  Bits_destroy(bit);
+  return tree;
+}
 

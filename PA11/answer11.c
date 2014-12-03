@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <answer11.h>
 #include <stdlib.h>
+#include "answer11.h"
 
 
 HuffNode * HuffNode_create(int value)
@@ -10,7 +10,7 @@ HuffNode * HuffNode_create(int value)
   node -> right = NULL;
   node -> left = NULL;
   return node;
-
+}
 
 void HuffNode_destroy(HuffNode * tree)
 {
@@ -85,7 +85,7 @@ HuffNode * Stack_popFront(Stack * stack)
 {
   if(Stack_isEmpty(stack))//if empty, return
   {
-    return;
+    return NULL;
   }
   HuffNode * tn = stack -> head -> tree;
   StackNode * a = stack -> head;
@@ -135,21 +135,7 @@ void Stack_popPopCombinePush(Stack * stack)
 /**
  * Read a Huffman Coding Tree (in text format) from 'fp'.
  */
-int SizeofStack(Stack * stack)
-{
-  if(stack ==NULL)
-  {
-    return 0;
-  }
-  int ind = 0;
-  StackNode * sn = stack -> head;
-  while(sn != NULL)
-  {
-    ind++;
-    sn = sn -> next;
-  }
-  return ind;
-}
+
   
 HuffNode * HuffTree_readTextHeader(FILE * fp)
 {
@@ -165,16 +151,16 @@ HuffNode * HuffTree_readTextHeader(FILE * fp)
     }
     else if( c =='0')//non-leaf node
     {
-      if(sizeofStack(sk) == 1)
+      if(sk -> head -> next == NULL)
       {
 	break;
       }
       Stack_popPopCombinePush(sk);
     }
-    c=fgetc(fp);
+    c = fgetc(fp);
   }
-  Huffnode * tn = Stack_popFront(stack);
-  Stack_destroy(stack);
+  HuffNode * tn = Stack_popFront(sk);
+  Stack_destroy(sk);
   return tn;
 }
     
@@ -186,7 +172,7 @@ HuffNode * HuffTree_readTextHeader(FILE * fp)
 
 typedef struct {
   FILE * fp;
-  int position;
+  int  offset;
   unsigned char byte;
 } Bits;
 
@@ -194,54 +180,68 @@ Bits * Bits_create(FILE * fp)
 {
   Bits * bit = malloc(sizeof(Bits));
   bit -> fp = fp;
+  bit -> offset = 8; // 1 byte is 8 bits
   bit -> byte = 0;
-  bit -> pos = 8; // 1 byte is 8 bits
 return bit;
 }
 
-void Bits_destroy(BitFile * bit)
+int Read_bits(Bits * bit)
+{
+  if (bit -> offset == 8)
+  {
+    bit -> offset = 0;            //8 bits
+    if (fread(&(bit -> byte), sizeof(unsigned char), 1, bit -> fp) !=1)
+    {
+    return -1;//out of bit
+    }
+  }
+  return ((bit -> byte) >> (7 - ((bit -> offset)++)) & 0x01);
+}
+
+
+int Read_bytes(Bits * bit)
+{
+  int ret = 0;
+  int pos = 0;
+  while(pos <= 7)//0-7
+  {
+    int num = Read_bits(bit);
+    if (num < 0)
+    {
+      return -1;//there's no more bits available 
+    }
+    ret = ret | (num << (7 - pos));
+    pos++;
+  }
+  return ret;
+}
+
+void Bits_destroy(Bits * bit)
 {
   free(bit);
 }
-
-int Bits_nbi(Bits * bit)
-{
-  if (bit -> pos == 8)
-  {
-    bit -> pos = 0;            //8 bits
-    if (fread(&(bit -> byte), sizeof(unsigned char), 1, bit -> fp) !=1)
-    {
-    return -1;
-    }
-  }
-  int val = (bit -> byte >> (7 - bit -> pos)) & 1;
-  (bit -> pos)++;
-  return val;
-}
-
-
 
 HuffNode * HuffTree_readBinaryHeader(FILE * fp)
 {
   Stack * stack = Stack_create();
   Bits * bit = Bits_create(fp);
-  int ind = Bits_nbi(bit);
-  while (ind >= 0)
+  int num = Read_bits(bit);
+  while (num >= 0)
   {
-    if (ind == 1)
+    if (num == 1)
     {
-      val = Bits_nby(bit);
-      Stack_pushFront(stack, HuffNode_create(ind));
+      num = Read_bytes(bit);
+      Stack_pushFront(stack, HuffNode_create(num));
     }
-    else if (ind == 0)
+    else if (num == 0)
     {
-      if (Stack_size(stack) == 1)
+      if (stack -> head != NULL && stack ->head ->next == NULL)  //just have a head
       {
 	break;
       }
       Stack_popPopCombinePush(stack);
     }
-    val = Bits_nbi(bit);
+    num = Read_bits(bit);
   }
   HuffNode * tree = Stack_popFront(stack);
   Stack_destroy(stack);

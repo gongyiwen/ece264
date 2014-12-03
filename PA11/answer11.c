@@ -38,7 +38,7 @@ typedef struct Stack_st
 } Stack;
 **/
 
-Stack * Stack_create()
+Stack * Stack_create()//head of a linked list
 {
   Stack * node = malloc(sizeof(Stack));
   node -> head = NULL;
@@ -54,12 +54,12 @@ void Stack_destroy(Stack * stack)
   }
   StackNode * node = stack -> head;
   StackNode * nx = NULL;//next
-  while(node != NULL)
+  while(node != NULL)//until reach the end of the linked list
   {
     nx = node -> next;
-    HuffNode_destroy(node-> tree);
-    free(node);
-    node = nx;
+    HuffNode_destroy(node-> tree);//destroy the tree in each node
+    free(node);//free the current node
+    node = nx;//point to the next node
   }
   free(stack); 
 }
@@ -87,11 +87,11 @@ HuffNode * Stack_popFront(Stack * stack)
   {
     return NULL;
   }
-  HuffNode * tn = stack -> head -> tree;
+  HuffNode * tn = stack -> head -> tree;//step 1,save the tree
   StackNode * a = stack -> head;
   stack -> head = stack -> head -> next;
-  free(a);
-  return(tn);
+  free(a);//step2
+  return(tn);//step3
 }
 
 /**
@@ -103,14 +103,14 @@ HuffNode * Stack_popFront(Stack * stack)
  */
 void Stack_pushFront(Stack * stack, HuffNode * tree)
 {
-  if(stack == NULL)
+  if(Stack_isEmpty(stack))//if empty, return
   {
     return;
   }
-  StackNode* sn = malloc(sizeof(StackNode));
-  sn -> tree = tree;
-  sn -> next = stack -> head;
-  stack -> head = sn;
+  StackNode* sn = malloc(sizeof(StackNode));//create a new StackNode
+  sn -> tree = tree;//with 'tree' for its tree
+  sn -> next = stack -> head;//push the node onto the front of the linked list
+  stack -> head = sn;//make the node the head
 }
   /**
  * This function helps simplify building a Huffman Coding Tree from the header
@@ -123,11 +123,11 @@ void Stack_pushFront(Stack * stack, HuffNode * tree)
 void Stack_popPopCombinePush(Stack * stack)
 {
   HuffNode * first = Stack_popFront(stack);
-  HuffNode * second = Stack_popFront(stack);
-  HuffNode * node = HuffNode_create(0);
+  HuffNode * second = Stack_popFront(stack);//pop the front 2 trees
+  HuffNode * node = HuffNode_create(0);//create a n empty node
   node -> left = second;
-  node -> right = first;
-  Stack_pushFront(stack,node);
+  node -> right = first;//combie them into a signel node
+  Stack_pushFront(stack,node);//push the new node back onto the fron of the list
 }
 
 // ---------------------------------------------------- Reading HuffTree headers
@@ -136,31 +136,30 @@ void Stack_popPopCombinePush(Stack * stack)
  * Read a Huffman Coding Tree (in text format) from 'fp'.
  */
 
-  
 HuffNode * HuffTree_readTextHeader(FILE * fp)
 {
-  int c=fgetc(fp);
+  int c = fgetc(fp);
   Stack* sk = Stack_create();
   while(!feof(fp))
   {
     if(c == '1')//leaf node
     {
       c = fgetc(fp);//get the character
-      HuffNode * tree = HuffNode_create(c);
-      Stack_pushFront(sk,tree);
+      HuffNode * tree = HuffNode_create(c);//a tree node with value 'c'
+      Stack_pushFront(sk,tree);//push the tree node to the front of the linked list,sk->head will be 'tree'
     }
-    else if( c =='0')//non-leaf node
+    else if( c =='0')//non-leaf node,combine
     {
-      if(sk -> head -> next == NULL)
+      if(sk -> head -> next == NULL)//have nothing to combine
       {
 	break;
       }
       Stack_popPopCombinePush(sk);
     }
-    c = fgetc(fp);
+    c = fgetc(fp);//continue read the next character
   }
-  HuffNode * tn = Stack_popFront(sk);
-  Stack_destroy(sk);
+  HuffNode * tn = Stack_popFront(sk);//pop the front node,which is the completed huffman tree
+  Stack_destroy(sk);//destory the stack
   return tn;
 }
     
@@ -190,12 +189,12 @@ int Read_bits(Bits * bit)
   if (bit -> offset == 8)
   {
     bit -> offset = 0;            //8 bits
-    if (fread(&(bit -> byte), sizeof(unsigned char), 1, bit -> fp) !=1)
+    if (fread(&(bit -> byte), sizeof(unsigned char), 1, bit -> fp) !=1)//read 1 byte then store into bit->byte
     {
     return -1;//out of bit
     }
   }
-  return ((bit -> byte) >> (7 - ((bit -> offset)++)) & 0x01);
+  return ((bit -> byte) >> (7 - ((bit -> offset)++)) & 0x01);//clear out all the bit except for the zeroth bit
 }
 
 

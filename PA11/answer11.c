@@ -200,25 +200,21 @@ int Read_bits(Bits * bit)
 
 int Read_bytes(Bits * bit)
 {
-  int ret = 0;
+  int ch = 0;
   int pos = 0;
   while(pos <= 7)//0-7
   {
     int num = Read_bits(bit);
     if (num < 0)
     {
-      return -1;//there's no more bits available 
+      return -1;//out of bit 
     }
-    ret = ret | (num << (7 - pos));
+    ch = ch | (num << (7 - pos));//set the bit
     pos++;
   }
-  return ret;
+  return ch;
 }
 
-void Bits_destroy(Bits * bit)
-{
-  free(bit);
-}
 
 HuffNode * HuffTree_readBinaryHeader(FILE * fp)
 {
@@ -227,12 +223,12 @@ HuffNode * HuffTree_readBinaryHeader(FILE * fp)
   int num = Read_bits(bit);
   while (num >= 0)
   {
-    if (num == 1)
+    if (num == 1)//leaf node
     {
       num = Read_bytes(bit);
       Stack_pushFront(stack, HuffNode_create(num));
     }
-    else if (num == 0)
+    else if (num == 0)//non-leaf node
     {
       if (stack -> head != NULL && stack ->head ->next == NULL)  //just have a head
       {
@@ -244,7 +240,7 @@ HuffNode * HuffTree_readBinaryHeader(FILE * fp)
   }
   HuffNode * tree = Stack_popFront(stack);
   Stack_destroy(stack);
-  Bits_destroy(bit);
+  free(bit);
   return tree;
 }
 

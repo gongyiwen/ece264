@@ -4,6 +4,13 @@
 #include <pthread.h>
 #include <math.h>
 #include "answer12.h"
+typedef struct Thread_data
+{
+  uint128 value;
+  uint128 left;//first number in one interval
+  uint128 right;//last number in one interval
+  int * check;
+}ThreadData;
 
 /**
  * Convert the initial portion of C-string 'str' to an unsigned 128-bit integer
@@ -22,7 +29,7 @@ uint128 alphaTou128(const char * str)
       str++;//skip white-space
     }
     uint128 ind = 0;
-    while(*str >= 0 && *str <=9)
+    while(*str >= '0' && *str <= '9')
     {
       ind *=10;
       ind+=(*str - '0');
@@ -41,27 +48,27 @@ uint128 alphaTou128(const char * str)
 char * u128ToString(uint128 value)
 {
     uint128 num = value;
-    uint128 ind = 0;
-    
+    long long ind = 0;
+    if(num == 0) 
+    {
+      ind = 1;
+    }
     while(num >= 1) 
     {// 0/10 = 0, leads to infinity loop
       ind++;
       num = num / 10;
     }
-    if(num == 0) 
-    {
-      ind += 1;
-    }
+
     char * str = malloc(sizeof(char) * (ind+1));
     str[ind] = '\0';
-    ind -= 1;
+    ind = ind - 1;
     while(ind >= 0) 
     {
-      ret[ind] = value % 10 + '0';
+      str[ind] = value % 10 + '0';
       ind--;
-      value = floor(value / 10);
+      value = value / 10;
     }
-    return ret;
+    return str;
 }
 
 /**
@@ -73,13 +80,7 @@ char * u128ToString(uint128 value)
  *
  * Good luck!
  */
-typedef struct
-{
-  uint128 value;
-  uint128 left;//first number in one interval
-  unit128 right;//last number in one interval
-  int * check;
-}ThreadData;
+
 
 ThreadData * ThreadData_create(uint128 value, uint128 left, uint128 right, int* check)
 {
@@ -99,18 +100,18 @@ void * worker(void * arg)
     {
       p_x -> left = 3;
     }
-    if(p_x -> left % 2 == 0)
+    else if(p_x -> left % 2 == 0)
     {
       p_x -> left++;
     }
     if(p_x -> value > 2 && (p_x -> left < p_x ->value)) 
     {
-      i = p_x -> left;
-      while(i< = p_x -> right  && *(p_x -> check) == TRUE)
+      ind = p_x -> left;
+      while(ind <= p_x -> right  && *(p_x -> check) == TRUE)
       {
-	if (p->value % ind == 0)
+	if (p_x ->value % ind == 0)
 	{
-	  *(p-> check) = FALSE;
+	  *(p_x -> check) = FALSE;
         }
         ind = ind + 2;
       }
@@ -121,37 +122,39 @@ void * worker(void * arg)
 
 int primalityTestParallel(uint128 value, int n_threads)
 {
-    if (value <= 1 || (value > 2 && value % 2 ==0)) 
+    if (value <= 1)
     {
       return FALSE;
     }
-    
-    
-    ThreadData * * ptr = malloc(sizeof(ThreadData *) * n_threads);
+    if(value > 2 && value % 2 == 0)
+    {
+      return FALSE;
+    }
+    ThreadData * * td = malloc(sizeof(ThreadData *) * n_threads);
     pthread_t * th = malloc(sizeof(pthread_t) * n_threads);
     uint128 max = floor(sqrt(value) * 1.10);
     int ind;
     int check = TRUE;
-    for(ind = 0; ind < n_threads; ind++) 
+    for(ind = 0; ind < n_threads -1; ind++) 
     {
-      ptr[ind] = ThreadData_create(value, ind * (max / n_threads) + 1, (ind + 1) * (max/n_threads), &check);
+      ptr[ind] = ThreadData_create(value, ind * (max / n_threads)+1, (ind + 1) * (max/n_threads), &check);
     }
+    ptr[ind] = ThreadData_create(value, ind * (max / n_threads), max, &check);
 
     for(ind = 0; ind < n_threads; ind++) 
     {
-      pthread_create(&th[ind], NULL, worker, &ptr[ind]);
+      pthread_create(&th[ind], NULL, worker, (void*)td[ind]);
     }
     for(ind = 0; ind < n_threads; ind++) 
     {
       pthread_join(th[ind], NULL);
     }
-    for(ind = 0; ind< n_threads; ind++) 
+    for(ind = 0; ind < n_threads; ind++) 
     {
-      free(ptr[ind]);
+      free(td[ind]);
     }
-    free(ptr);
     free(th);
-
+    free(td);
     return check;
 
 }

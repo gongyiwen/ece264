@@ -73,6 +73,85 @@ char * u128ToString(uint128 value)
  *
  * Good luck!
  */
-int primalityTestParallel(uint128 value, int n_threads);
+typedef struct
+{
+  uint128 value;
+  uint128 left;//first number in one interval
+  unit128 right;//last number in one interval
+  int * check;
+}ThreadData;
 
-#endif
+ThreadData * ThreadData_create(uint128 value, uint128 left, uint128 right, int* check)
+{
+  ThreadData * thread = malloc(sizeof(ThreadData)); 
+  thread -> value = value;
+  thread -> left = left;
+  thread -> right = right;
+  thread -> check = check;
+  return(thread);
+}
+
+void * worker(void * arg)
+{
+    ThreadData * p_x = (ThreadData *) arg;
+    uint128 ind;
+    if(p_x -> left <= 3) 
+    {
+      p_x -> left = 3;
+    }
+    if(p_x -> left % 2 == 0)
+    {
+      p_x -> left++;
+    }
+    if(p_x -> value > 2 && (p_x -> left < p_x ->value)) 
+    {
+      i = p_x -> left;
+      while(i< = p_x -> right  && *(p_x -> check) == TRUE)
+      {
+	if (p->value % ind == 0)
+	{
+	  *(p-> check) = FALSE;
+        }
+        ind = ind + 2;
+      }
+    }
+    pthread_exit(0);
+}
+
+
+int primalityTestParallel(uint128 value, int n_threads)
+{
+    if (value <= 1 || (value > 2 && value % 2 ==0)) 
+    {
+      return FALSE;
+    }
+    
+    
+    ThreadData * * ptr = malloc(sizeof(ThreadData *) * n_threads);
+    pthread_t * th = malloc(sizeof(pthread_t) * n_threads);
+    uint128 max = floor(sqrt(value) * 1.10);
+    int ind;
+    int check = TRUE;
+    for(ind = 0; ind < n_threads; ind++) 
+    {
+      ptr[ind] = ThreadData_create(value, ind * (max / n_threads) + 1, (ind + 1) * (max/n_threads), &check);
+    }
+
+    for(ind = 0; ind < n_threads; ind++) 
+    {
+      pthread_create(&th[ind], NULL, worker, &ptr[ind]);
+    }
+    for(ind = 0; ind < n_threads; ind++) 
+    {
+      pthread_join(th[ind], NULL);
+    }
+    for(ind = 0; ind< n_threads; ind++) 
+    {
+      free(ptr[ind]);
+    }
+    free(ptr);
+    free(th);
+
+    return check;
+
+}
